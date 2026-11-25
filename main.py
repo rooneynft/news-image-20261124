@@ -1,24 +1,24 @@
-#!/usr/bin/env python3
-"""Copy entry.png to the grader's output directory.
+"""Ship the 24 November 2026 front page to the grader's folder.
 
-Reads the entry.png sitting beside this file and writes an identical
-copy to MAKEFUN_OUTPUT_DIR when set, otherwise /output. Deterministic:
-a plain byte copy, so two runs produce identical output.
-"""
+The grader runs this file with no arguments in a read-only checkout, and
+the only thing it may assume is the environment: MAKEFUN_OUTPUT_DIR names
+the folder the picture belongs in. The picture itself is already in the
+repo as entry.png, so this file only moves its bytes to where asked."""
 
-import os
-import shutil
+from os import environ, makedirs, path
 
 
-def main():
-    here = os.path.dirname(os.path.abspath(__file__))
-    src = os.path.join(here, "entry.png")
-    out_dir = os.environ.get("MAKEFUN_OUTPUT_DIR") or "/output"
-    os.makedirs(out_dir, exist_ok=True)
-    dst = os.path.join(out_dir, "entry.png")
-    shutil.copyfile(src, dst)
-    print(f"Wrote {dst} ({os.path.getsize(dst)} bytes)")
+def ship():
+    here = path.dirname(path.abspath(__file__))
+    page = path.join(here, "entry.png")
+    folder = environ.get("MAKEFUN_OUTPUT_DIR") or "/output"
+    makedirs(folder, exist_ok=True)
+    target = path.join(folder, "entry.png")
+    with open(page, "rb") as taken:
+        picture = taken.read()
+    with open(target, "wb") as given:
+        given.write(picture)
+    print(f"Shipped {target} ({len(picture)} bytes)")
 
 
-if __name__ == "__main__":
-    main()
+ship()
